@@ -19,11 +19,52 @@ print_usage() {
   echo "Usage: $0 <project_name>"  # Provide a concise usage message
 }
 
-# Function to list all layer 2 folders from the root directory
-list_layer_2_folders() {
-  # Use find to list all layer 2 folders
-  find "$root_directory" -maxdepth 2 -mindepth 2 -type d -exec basename {} \;
+
+# Function to list all layer 1 folders from the root directory
+list_layer_1_folders() {
+  find "$root_directory" -maxdepth 1 -mindepth 1 -type d -exec basename {} \;
 }
+
+# Function to list all layer 2 folders inside a given layer 1 folder
+list_layer_2_folders() {
+  find "$1" -maxdepth 1 -mindepth 1 -type d -exec basename {} \;
+}
+
+# Function to loop over the first layer list and print names with index
+loop_over_layer_1_folders() {
+  for folder in $(list_layer_1_folders); do
+    echo -e "\e[1m Language:\e[0m $folder"
+    
+    # List layer 2 folders for the current layer 1 folder
+    total_layer_2_folders=$(list_layer_2_folders "$root_directory/$folder" | wc -l)
+    
+    if [ $total_layer_2_folders -eq 0 ]; then
+      echo -e "  - \e[2mNo projectfolders found\e[0m"
+    else
+      layer_2_index=0
+      
+      for subfolder in $(list_layer_2_folders "$root_directory/$folder"); do
+        # Improved indentation and formatting
+        echo -e "    -|---> $subfolder"
+        
+        # Check if it's the last subfolder and add a line break
+        if [ $layer_2_index -eq $((total_layer_2_folders - 1)) ]; then
+          echo
+        fi
+        
+        ((layer_2_index++))
+      done
+    fi
+
+    # Add a line break between different languages
+    echo
+  done
+}
+
+
+
+
+
 
 # Function to list files and directories within a folder
 list_files_and_directories() {
@@ -51,14 +92,12 @@ search_project() {
 
     # Display a list of all layer 2 folders within the root directory
     echo "The following list includes all projects within the projects directory:"
+    echo
 
     
     # Call the custom function to list all layer 2 folders
-    list_layer_2_folders
+    loop_over_layer_1_folders
 
-    # Add a newline for better formatting
-    echo
-    
     # Exit the script with a success status (0)
     exit 0 
   fi
