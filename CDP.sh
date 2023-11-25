@@ -3,14 +3,16 @@
 ### Project Variables ###
 
 # Specify the root directory for the search
-root_directory="/home/rodhor/Documents/Projects"
+root_directory="insert your projects rootfolder"
 
 ### Functions ###
 
 # Function to handle the case when required arguments are missing
 no_args() {
-  echo "Please add the project name as an argument"  # Inform the user that arguments are missing
   print_usage  # Display usage instructions
+  echo "List of possible projects:"
+  echo
+  loop_over_layer_1_folders
   exit 1  # Exit the script with a non-zero status (error)
 }
 
@@ -18,7 +20,6 @@ no_args() {
 print_usage() {
   echo "Usage: $0 <project_name>"  # Provide a concise usage message
 }
-
 
 # Function to list all layer 1 folders from the root directory
 list_layer_1_folders() {
@@ -39,7 +40,8 @@ loop_over_layer_1_folders() {
     total_layer_2_folders=$(list_layer_2_folders "$root_directory/$folder" | wc -l)
     
     if [ $total_layer_2_folders -eq 0 ]; then
-      echo -e "  - \e[2mNo projectfolders found\e[0m"
+      echo -e "  - \e[2mNo project folders found\e[0m"
+      echo
     else
       layer_2_index=0
       
@@ -55,16 +57,8 @@ loop_over_layer_1_folders() {
         ((layer_2_index++))
       done
     fi
-
-    # Add a line break between different languages
-    echo
   done
 }
-
-
-
-
-
 
 # Function to list files and directories within a folder
 list_files_and_directories() {
@@ -93,7 +87,6 @@ search_project() {
     # Display a list of all layer 2 folders within the root directory
     echo "The following list includes all projects within the projects directory:"
     echo
-
     
     # Call the custom function to list all layer 2 folders
     loop_over_layer_1_folders
@@ -112,7 +105,7 @@ search_project() {
   list_files_and_directories "$found_directory"
 
   # Open the directory in VSCode (assuming 'code' is the command for VSCode)
-  #code .
+  code .
 
   # Open a new shell session
   $SHELL
